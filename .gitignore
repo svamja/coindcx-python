@@ -1,1 +1,38 @@
+# Claude Code
 .claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+
+# API Credentials and Secrets
+.env
+*.key
+credentials.json
+secrets.json
+config.ini
+api_keys.txt
+
+# Logs
+*.log
