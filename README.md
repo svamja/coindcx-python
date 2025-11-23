@@ -1,6 +1,7 @@
 # CoinDCX Python API
 
 A Python wrapper for the CoinDCX API with support for public market data, authenticated trading, and WebSocket streams.
+Please note this is NOT officially created or maintained by CoinDCX.
 
 ## Features
 
