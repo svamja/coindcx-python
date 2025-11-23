@@ -20,6 +20,10 @@ from .exceptions import (
     CoinDCXRateLimitException,
 )
 from .enums import API_BASE_URL, PUBLIC_BASE_URL
+from .endpoints.market import MarketEndpoints
+from .endpoints.spot import SpotEndpoints
+from .endpoints.margin import MarginEndpoints
+from .endpoints.futures import FuturesEndpoints
 
 
 class Client:
@@ -61,6 +65,12 @@ class Client:
         self.public_url = public_url
         self.timeout = timeout
         self.session = requests.Session()
+
+        # Initialize endpoint modules
+        self.market = MarketEndpoints(self._get)
+        self.spot = SpotEndpoints(self._post)
+        self.margin = MarginEndpoints(self._post)
+        self.futures = FuturesEndpoints(self._post)
 
     def _generate_signature(self, payload: str) -> str:
         """
@@ -239,6 +249,7 @@ class Client:
         return self._request('POST', endpoint, authenticated=True, data=data)
 
     # ===== Public Endpoints =====
+    # Delegated to MarketEndpoints
 
     def get_ticker(self) -> list:
         """
@@ -251,7 +262,7 @@ class Client:
             >>> client = Client()
             >>> tickers = client.get_ticker()
         """
-        return self._get('/exchange/ticker')
+        return self.market.get_ticker()
 
     def get_markets(self) -> list:
         """
@@ -265,7 +276,7 @@ class Client:
             >>> markets = client.get_markets()
             >>> print(markets)  # ['SNTBTC', 'TRXBTC', ...]
         """
-        return self._get('/exchange/v1/markets')
+        return self.market.get_markets()
 
     def get_markets_details(self) -> list:
         """
@@ -278,7 +289,7 @@ class Client:
             >>> client = Client()
             >>> details = client.get_markets_details()
         """
-        return self._get('/exchange/v1/markets_details')
+        return self.market.get_markets_details()
 
     def get_trades(self, pair: str, limit: int = 30) -> list:
         """
@@ -295,8 +306,7 @@ class Client:
             >>> client = Client()
             >>> trades = client.get_trades('B-BTC_USDT', limit=50)
         """
-        params = {'pair': pair, 'limit': limit}
-        return self._get('/market_data/trade_history', params=params, use_public_url=True)
+        return self.market.get_trades(pair, limit)
 
     def get_orderbook(self, pair: str) -> dict:
         """
@@ -313,8 +323,7 @@ class Client:
             >>> orderbook = client.get_orderbook('B-BTC_USDT')
             >>> print(orderbook['bids'])
         """
-        params = {'pair': pair}
-        return self._get('/market_data/orderbook', params=params, use_public_url=True)
+        return self.market.get_orderbook(pair)
 
     def get_candles(
         self,
@@ -341,20 +350,10 @@ class Client:
             >>> client = Client()
             >>> candles = client.get_candles('B-BTC_USDT', '1h', limit=100)
         """
-        params = {
-            'pair': pair,
-            'interval': interval,
-            'limit': limit,
-        }
-
-        if start_time:
-            params['startTime'] = start_time
-        if end_time:
-            params['endTime'] = end_time
-
-        return self._get('/market_data/candles', params=params, use_public_url=True)
+        return self.market.get_candles(pair, interval, start_time, end_time, limit)
 
     # ===== Authenticated Endpoints =====
+    # Delegated to SpotEndpoints
 
     def get_balances(self) -> list:
         """
@@ -372,7 +371,7 @@ class Client:
         Raises:
             CoinDCXAuthenticationException: If API credentials not provided
         """
-        return self._post('/exchange/v1/users/balances')
+        return self.spot.get_balances()
 
     def get_user_info(self) -> dict:
         """
@@ -389,7 +388,7 @@ class Client:
         Raises:
             CoinDCXAuthenticationException: If API credentials not provided
         """
-        return self._post('/exchange/v1/users/info')
+        return self.spot.get_user_info()
 
     def close(self):
         """Close the client session"""
