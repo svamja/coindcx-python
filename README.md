@@ -57,16 +57,16 @@ for market in details[:3]:
     print(f"{market['coindcx_name']}: Min quantity = {market['min_quantity']}")
 
 # Get order book
-orderbook = client.get_orderbook('B-BTC_USDT')
+orderbook = client.get_orderbook('KC-BTC_USDT')
 print(f"Best bid: {list(orderbook['bids'].keys())[0]}")
 print(f"Best ask: {list(orderbook['asks'].keys())[0]}")
 
 # Get recent trades
-trades = client.get_trades('B-BTC_USDT', limit=10)
+trades = client.get_trades('KC-BTC_USDT', limit=10)
 print(f"Latest trade price: {trades[0]['p']}")
 
 # Get candlestick data
-candles = client.get_candles('B-BTC_USDT', interval='1h', limit=24)
+candles = client.get_candles('KC-BTC_USDT', interval='1h', limit=24)
 print(f"24h candles received: {len(candles)}")
 ```
 
@@ -139,19 +139,20 @@ python cli.py get_markets
 python cli.py get_ticker
 
 # Get recent trades with parameters
-python cli.py get_trades --pair=B-BTC_USDT --limit=10
+python cli.py get_trades --pair=KC-BTC_USDT --limit=10
 
 # Get order book for a specific pair
-python cli.py get_orderbook --pair=B-BTC_USDT
+python cli.py get_orderbook --pair=KC-BTC_USDT
 
 # Get candlestick data
-python cli.py get_candles --pair=B-BTC_USDT --interval=1h --limit=24
+python cli.py get_candles --pair=KC-BTC_USDT --interval=1h --limit=24
 
 # Get markets details
 python cli.py get_markets_details
 
 # Get futures candles
-python cli.py get_futures_candles --pair=B-BTC_USDT --from_time=1700000000 --to_time=1700086400 --resolution=1D
+python cli.py get_futures_candles --pair=KC-BTC_USDT --from_time=1700000000 --to_time=1700086400 --resolution=1D
+
 ```
 
 **Authenticated Endpoints:**
@@ -172,7 +173,7 @@ python cli.py get_user_info
 
 ```bash
 # Customize timeout
-python cli.py get_candles --pair=B-BTC_USDT --interval=1h --timeout=60
+python cli.py get_candles --pair=KC-BTC_USDT --interval=1h --timeout=60
 
 # Disable pretty printing (compact JSON)
 python cli.py get_markets --pretty=false
@@ -211,7 +212,7 @@ export COINDCX_API_SECRET="your_secret"
 
 while true; do
   echo "Checking BTC price at $(date)"
-  python cli.py get_orderbook --pair=B-BTC_USDT | jq -r '.asks | keys[0]'
+  python cli.py get_orderbook --pair=KC-BTC_USDT | jq -r '.asks | keys[0]'
   sleep 30
 done
 ```
@@ -266,7 +267,7 @@ from coindcx import Client, OrderSide, OrderType, CandleInterval
 
 # Use enums for type safety
 candles = client.get_candles(
-    pair='B-BTC_USDT',
+    pair='KC-BTC_USDT',
     interval=CandleInterval.ONE_HOUR,
     limit=100
 )

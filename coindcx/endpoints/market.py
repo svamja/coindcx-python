@@ -73,7 +73,7 @@ class MarketEndpoints:
         Get recent trades for a market pair
 
         Args:
-            pair: Market pair (e.g., 'B-BTC_USDT')
+            pair: Market pair (e.g., 'KC-BTC_USDT')
             limit: Number of trades to fetch (default: 30, max: 500)
 
         Returns:
@@ -81,7 +81,7 @@ class MarketEndpoints:
 
         Example:
             >>> client = Client()
-            >>> trades = client.get_trades('B-BTC_USDT', limit=50)
+            >>> trades = client.get_trades('KC-BTC_USDT', limit=50)
         """
         params = {'pair': pair, 'limit': limit}
         return self._get('/market_data/trade_history', params=params, use_public_url=True)
@@ -91,14 +91,14 @@ class MarketEndpoints:
         Get order book for a market pair
 
         Args:
-            pair: Market pair (e.g., 'B-BTC_USDT')
+            pair: Market pair (e.g., 'KC-BTC_USDT')
 
         Returns:
             Order book with bids and asks
 
         Example:
             >>> client = Client()
-            >>> orderbook = client.get_orderbook('B-BTC_USDT')
+            >>> orderbook = client.get_orderbook('KC-BTC_USDT')
             >>> print(orderbook['bids'])
         """
         params = {'pair': pair}
@@ -116,7 +116,7 @@ class MarketEndpoints:
         Get candlestick data for a market pair
 
         Args:
-            pair: Market pair (e.g., 'B-BTC_USDT')
+            pair: Market pair (e.g., 'KC-BTC_USDT')
             interval: Candlestick interval (e.g., '1m', '5m', '1h', '1d')
             start_time: Start timestamp in milliseconds (optional)
             end_time: End timestamp in milliseconds (optional)
@@ -127,7 +127,7 @@ class MarketEndpoints:
 
         Example:
             >>> client = Client()
-            >>> candles = client.get_candles('B-BTC_USDT', '1h', limit=100)
+            >>> candles = client.get_candles('KC-BTC_USDT', '1h', limit=100)
         """
         params = {
             'pair': pair,

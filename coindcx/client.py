@@ -296,7 +296,7 @@ class Client:
         Get recent trades for a market pair
 
         Args:
-            pair: Market pair (e.g., 'B-BTC_USDT')
+            pair: Market pair (e.g., 'KC-BTC_USDT')
             limit: Number of trades to fetch (default: 30, max: 500)
 
         Returns:
@@ -304,7 +304,7 @@ class Client:
 
         Example:
             >>> client = Client()
-            >>> trades = client.get_trades('B-BTC_USDT', limit=50)
+            >>> trades = client.get_trades('KC-BTC_USDT', limit=50)
         """
         return self.market.get_trades(pair, limit)
 
@@ -313,14 +313,14 @@ class Client:
         Get order book for a market pair
 
         Args:
-            pair: Market pair (e.g., 'B-BTC_USDT')
+            pair: Market pair (e.g., 'KC-BTC_USDT')
 
         Returns:
             Order book with bids and asks
 
         Example:
             >>> client = Client()
-            >>> orderbook = client.get_orderbook('B-BTC_USDT')
+            >>> orderbook = client.get_orderbook('KC-BTC_USDT')
             >>> print(orderbook['bids'])
         """
         return self.market.get_orderbook(pair)
@@ -337,7 +337,7 @@ class Client:
         Get candlestick data for a market pair
 
         Args:
-            pair: Market pair (e.g., 'B-BTC_USDT')
+            pair: Market pair (e.g., 'KC-BTC_USDT')
             interval: Candlestick interval (e.g., '1m', '5m', '1h', '1d')
             start_time: Start timestamp in milliseconds (optional)
             end_time: End timestamp in milliseconds (optional)
@@ -348,7 +348,7 @@ class Client:
 
         Example:
             >>> client = Client()
-            >>> candles = client.get_candles('B-BTC_USDT', '1h', limit=100)
+            >>> candles = client.get_candles('KC-BTC_USDT', '1h', limit=100)
         """
         return self.market.get_candles(pair, interval, start_time, end_time, limit)
 
@@ -404,7 +404,7 @@ class Client:
         Get candlestick data for a futures instrument
 
         Args:
-            pair: Futures pair (e.g., 'B-BTC_USDT')
+            pair: Futures pair (e.g., 'KC-BTC_USDT')
             from_time: Start timestamp in seconds (EPOCH)
             to_time: End timestamp in seconds (EPOCH)
             resolution: Candle resolution - '1' (1min), '5' (5min), '60' (1hour), '1D' (1day)
@@ -422,7 +422,7 @@ class Client:
             >>> to_time = int(time.time())
             >>> from_time = to_time - (7 * 24 * 60 * 60)  # 7 days ago
             >>> candles = client.get_futures_candles(
-            ...     'B-BTC_USDT',
+            ...     'KC-BTC_USDT',
             ...     from_time,
             ...     to_time,
             ...     FuturesResolution.ONE_DAY

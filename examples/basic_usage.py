@@ -62,9 +62,9 @@ def public_endpoints_example():
         print(f"   ✗ Error: {e}")
 
     # Get order book for a specific pair
-    print("\n4. Getting order book for B-BTC_USDT...")
+    print("\n4. Getting order book for KC-BTC_USDT...")
     try:
-        orderbook = client.get_orderbook('B-BTC_USDT')
+        orderbook = client.get_orderbook('KC-BTC_USDT')
         bids = orderbook.get('bids', {})
         asks = orderbook.get('asks', {})
         if bids and asks:
@@ -79,9 +79,9 @@ def public_endpoints_example():
         print(f"   ✗ Error: {e}")
 
     # Get recent trades
-    print("\n5. Getting recent trades for B-BTC_USDT...")
+    print("\n5. Getting recent trades for KC-BTC_USDT...")
     try:
-        trades = client.get_trades('B-BTC_USDT', limit=5)
+        trades = client.get_trades('KC-BTC_USDT', limit=5)
         print(f"   ✓ Retrieved {len(trades)} recent trades")
         for i, trade in enumerate(trades[:3], 1):
             print(f"   {i}. Price: {trade['p']}, Quantity: {trade['q']}")

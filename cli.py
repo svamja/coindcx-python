@@ -9,9 +9,9 @@ Examples:
     # Public endpoints (no auth required)
     python cli.py get_markets
     python cli.py get_ticker
-    python cli.py get_trades --pair=B-BTC_USDT --limit=10
-    python cli.py get_orderbook --pair=B-BTC_USDT
-    python cli.py get_candles --pair=B-BTC_USDT --interval=1h --limit=24
+    python cli.py get_trades --pair=KC-BTC_USDT --limit=10
+    python cli.py get_orderbook --pair=KC-BTC_USDT
+    python cli.py get_candles --pair=KC-BTC_USDT --interval=1h --limit=24
 
     # Authenticated endpoints (requires API credentials)
     python cli.py get_balances --api-key=YOUR_KEY --api-secret=YOUR_SECRET
@@ -23,7 +23,7 @@ Examples:
     python cli.py get_balances
 
     # Futures endpoints
-    python cli.py get_futures_candles --pair=B-BTC_USDT --from_time=1234567890 --to_time=1234567900 --resolution=1D
+    python cli.py get_futures_candles --pair=KC-BTC_USDT --from_time=1234567890 --to_time=1234567900 --resolution=1D
 
 Features:
     - Automatic method discovery from Client class

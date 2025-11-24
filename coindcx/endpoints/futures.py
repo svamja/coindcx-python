@@ -43,7 +43,7 @@ class FuturesEndpoints:
         Get candlestick data for a futures instrument
 
         Args:
-            pair: Futures pair (e.g., 'B-BTC_USDT')
+            pair: Futures pair (e.g., 'KC-BTC_USDT')
             from_time: Start timestamp in seconds (EPOCH)
             to_time: End timestamp in seconds (EPOCH)
             resolution: Candle resolution - '1' (1min), '5' (5min), '60' (1hour), '1D' (1day)
@@ -59,7 +59,7 @@ class FuturesEndpoints:
             >>> import time
             >>> to_time = int(time.time())
             >>> from_time = to_time - (7 * 24 * 60 * 60)  # 7 days ago
-            >>> candles = client.get_futures_candles('B-BTC_USDT', from_time, to_time, '1D')
+            >>> candles = client.get_futures_candles('KC-BTC_USDT', from_time, to_time, '1D')
             >>> print(f"Status: {candles['s']}")
             >>> for candle in candles['data']:
             ...     print(f"Open: {candle['open']}, Close: {candle['close']}")
