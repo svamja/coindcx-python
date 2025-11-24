@@ -181,8 +181,9 @@ python cli.py get_markets_details
 # Get futures candles
 python cli.py get_futures_candles --pair=KC-BTC_USDT --from_time=1700000000 --to_time=1700086400 --resolution=1D
 
-# Get active futures instruments
+# Get active futures instruments (JSON format or comma-separated)
 python cli.py get_active_instruments --margin_currency_short_name=["USDT"]
+python cli.py get_active_instruments --margin_currency_short_name=USDT,INR
 
 # Get instrument details
 python cli.py get_instrument_details --pair=KC-BTC_USDT --margin_currency_short_name=USDT
@@ -421,7 +422,8 @@ python examples/futures_instruments.py  # Futures instruments example
 python cli.py get_markets
 python cli.py get_ticker
 python cli.py get_balances  # Requires API credentials
-python cli.py get_active_instruments --margin_currency_short_name=["USDT"]
+python cli.py get_active_instruments --margin_currency_short_name=USDT
+python cli.py get_instrument_details --pair=KC-BTC_USDT
 ```
 
 ## Getting API Credentials

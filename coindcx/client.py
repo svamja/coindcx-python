@@ -436,6 +436,62 @@ class Client:
         """
         return self.futures.get_futures_candles(pair, from_time, to_time, resolution)
 
+    def get_active_instruments(self, margin_currency_short_name: Optional[list] = None) -> list:
+        """
+        Get list of all active futures instruments
+
+        Args:
+            margin_currency_short_name: List of margin currencies to filter by (e.g., ['USDT'], ['INR'], or ['USDT', 'INR'])
+                                       If not provided, returns instruments for USDT margin mode by default
+
+        Returns:
+            List of active instrument pairs (e.g., ['KC-BTC_USDT', 'KC-ETH_USDT', ...])
+
+        Example:
+            >>> client = Client()
+            >>> # Get USDT margined instruments
+            >>> usdt_instruments = client.get_active_instruments(['USDT'])
+            >>> print(f"Total USDT instruments: {len(usdt_instruments)}")
+            >>>
+            >>> # Get INR margined instruments
+            >>> inr_instruments = client.get_active_instruments(['INR'])
+            >>>
+            >>> # Get both USDT and INR margined instruments
+            >>> all_instruments = client.get_active_instruments(['USDT', 'INR'])
+
+        Note:
+            - This is a public endpoint, no authentication required
+            - Defaults to USDT margin mode if not specified
+        """
+        return self.futures.get_active_instruments(margin_currency_short_name)
+
+    def get_instrument_details(self, pair: str, margin_currency_short_name: str = 'USDT') -> dict:
+        """
+        Get detailed information for a specific futures instrument
+
+        Args:
+            pair: Futures instrument pair (e.g., 'KC-BTC_USDT', 'KC-ETH_USDT')
+            margin_currency_short_name: Margin currency mode - 'USDT' or 'INR' (default: 'USDT')
+
+        Returns:
+            Dictionary containing detailed instrument information including trading rules,
+            fees, leverage limits, and other configuration
+
+        Example:
+            >>> client = Client()
+            >>> # Get BTC futures instrument details
+            >>> details = client.get_instrument_details('KC-BTC_USDT', 'USDT')
+            >>> instrument = details['instrument']
+            >>> print(f"Status: {instrument['status']}")
+            >>> print(f"Max leverage: {instrument['max_leverage_long']}x")
+            >>> print(f"Maker fee: {instrument['maker_fee']}%")
+
+        Note:
+            - This is a public endpoint, no authentication required
+            - Returns comprehensive instrument configuration and trading rules
+        """
+        return self.futures.get_instrument_details(pair, margin_currency_short_name)
+
     def close(self):
         """Close the client session"""
         self.session.close()

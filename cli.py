@@ -24,6 +24,9 @@ Examples:
 
     # Futures endpoints
     python cli.py get_futures_candles --pair=KC-BTC_USDT --from_time=1234567890 --to_time=1234567900 --resolution=1D
+    python cli.py get_active_instruments --margin_currency_short_name=["USDT"]
+    python cli.py get_active_instruments --margin_currency_short_name=USDT,INR
+    python cli.py get_instrument_details --pair=KC-BTC_USDT --margin_currency_short_name=USDT
 
 Features:
     - Automatic method discovery from Client class
@@ -65,6 +68,24 @@ def convert_value(value: str, expected_type):
         args = get_args(expected_type)
         if args:
             expected_type = args[0]
+            origin = get_origin(expected_type)
+
+    # Handle list types (e.g., list, List[str])
+    if expected_type == list or origin == list:
+        # Try to parse as JSON first
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, list):
+                return parsed
+        except (json.JSONDecodeError, ValueError):
+            pass
+
+        # If not JSON, try to split by comma
+        if ',' in value:
+            return [item.strip() for item in value.split(',')]
+
+        # Single item list
+        return [value.strip()]
 
     # Handle basic types
     if expected_type == int or str(expected_type) == 'int':

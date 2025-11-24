@@ -13,6 +13,8 @@ class FuturesEndpoints:
 
     Handles both public and authenticated endpoints for futures trading including:
     - Get futures candles (public)
+    - Get active instruments (public)
+    - Get instrument details (public)
     - Create futures order (authenticated)
     - Cancel futures order (authenticated)
     - Get futures positions (authenticated)
