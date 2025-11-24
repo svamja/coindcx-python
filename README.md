@@ -7,6 +7,7 @@ Please note this is NOT officially created or maintained by CoinDCX.
 ## Features
 
 - ✅ **Single unified client** for both public and authenticated endpoints
+- ✅ **Generic CLI tool** for command-line usage with automatic method discovery
 - ✅ **Type hints** for better IDE support
 - ✅ **Automatic HMAC-SHA256 signature generation**
 - ✅ **Comprehensive error handling** with custom exceptions
@@ -102,6 +103,124 @@ with Client(api_key='...', api_secret='...') as client:
     balances = client.get_balances()
     print(balances)
 # Session automatically closed here
+```
+
+## Command-Line Interface (CLI)
+
+The library includes a powerful generic CLI tool that automatically exposes all client methods for command-line usage. Perfect for quick testing, scripting, and automation.
+
+### Features
+
+- **Automatic method discovery** - Works with all current and future methods without modification
+- **Type inference** - Automatically converts arguments to correct types
+- **Environment variable support** - Securely pass API credentials
+- **Pretty JSON output** - Formatted for readability
+- **Built-in help** - View all available methods and their parameters
+
+### Basic Usage
+
+```bash
+# View all available methods and their parameters
+python cli.py --help
+
+# Call any method with named parameters
+python cli.py [method_name] --arg1=value1 --arg2=value2
+```
+
+### Examples
+
+**Public Endpoints (No Authentication):**
+
+```bash
+# Get all markets
+python cli.py get_markets
+
+# Get ticker data for all markets
+python cli.py get_ticker
+
+# Get recent trades with parameters
+python cli.py get_trades --pair=B-BTC_USDT --limit=10
+
+# Get order book for a specific pair
+python cli.py get_orderbook --pair=B-BTC_USDT
+
+# Get candlestick data
+python cli.py get_candles --pair=B-BTC_USDT --interval=1h --limit=24
+
+# Get markets details
+python cli.py get_markets_details
+
+# Get futures candles
+python cli.py get_futures_candles --pair=B-BTC_USDT --from_time=1700000000 --to_time=1700086400 --resolution=1D
+```
+
+**Authenticated Endpoints:**
+
+```bash
+# Option 1: Pass credentials as arguments
+python cli.py get_balances --api-key=YOUR_KEY --api-secret=YOUR_SECRET
+python cli.py get_user_info --api-key=YOUR_KEY --api-secret=YOUR_SECRET
+
+# Option 2: Use environment variables (recommended for security)
+export COINDCX_API_KEY="your_api_key"
+export COINDCX_API_SECRET="your_api_secret"
+python cli.py get_balances
+python cli.py get_user_info
+```
+
+**Additional Options:**
+
+```bash
+# Customize timeout
+python cli.py get_candles --pair=B-BTC_USDT --interval=1h --timeout=60
+
+# Disable pretty printing (compact JSON)
+python cli.py get_markets --pretty=false
+```
+
+### How It Works
+
+The CLI uses Python's introspection to:
+1. Discover all public methods from the `Client` class
+2. Extract type hints and parameter information
+3. Automatically convert string arguments to the correct types (int, float, bool, etc.)
+4. Validate required vs optional parameters
+
+**This means any new methods you add to the Client class are automatically available in the CLI without any changes!**
+
+### CLI Options
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `--api-key` | API key for authentication | `--api-key=YOUR_KEY` |
+| `--api-secret` | API secret for authentication | `--api-secret=YOUR_SECRET` |
+| `--timeout` | Request timeout in seconds (default: 30) | `--timeout=60` |
+| `--pretty` | Pretty print JSON output (default: true) | `--pretty=false` |
+| `--help`, `-h` | Show help message | `python cli.py --help` |
+
+### Scripting Examples
+
+The CLI is perfect for shell scripts and automation:
+
+```bash
+#!/bin/bash
+# Monitor BTC price every 30 seconds
+
+export COINDCX_API_KEY="your_key"
+export COINDCX_API_SECRET="your_secret"
+
+while true; do
+  echo "Checking BTC price at $(date)"
+  python cli.py get_orderbook --pair=B-BTC_USDT | jq -r '.asks | keys[0]'
+  sleep 30
+done
+```
+
+```bash
+#!/bin/bash
+# Get account balances and filter non-zero balances
+
+python cli.py get_balances | jq '.[] | select((.balance | tonumber) > 0)'
 ```
 
 ## Error Handling
@@ -234,7 +353,7 @@ coindcx_api/
 │   ├── client.py          # Main Client class
 │   ├── exceptions.py      # Custom exceptions
 │   ├── enums.py          # Enums and constants
-│   └── endpoints/        # Future: Modular endpoint implementations
+│   └── endpoints/        # Modular endpoint implementations
 │       ├── __init__.py
 │       ├── market.py     # Public market endpoints
 │       ├── spot.py       # Spot trading
@@ -242,6 +361,7 @@ coindcx_api/
 │       └── futures.py    # Futures trading
 ├── examples/
 │   └── basic_usage.py
+├── cli.py                # Command-line interface tool
 ├── setup.py
 ├── requirements.txt
 └── README.md
@@ -254,8 +374,13 @@ coindcx_api/
 export COINDCX_API_KEY="your_api_key"
 export COINDCX_API_SECRET="your_api_secret"
 
-# Run examples
+# Run Python examples
 python examples/basic_usage.py
+
+# Or use the CLI tool for quick testing
+python cli.py get_markets
+python cli.py get_ticker
+python cli.py get_balances  # Requires API credentials
 ```
 
 ## Getting API Credentials
@@ -307,6 +432,8 @@ This library is not officially affiliated with CoinDCX. Use at your own risk. Tr
 - Support for basic authenticated endpoints
 - HMAC-SHA256 signature generation
 - Comprehensive error handling
+- Generic CLI tool with automatic method discovery
+- Futures endpoints support
 
 ---
 
