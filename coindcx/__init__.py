@@ -47,6 +47,7 @@ from .enums import (
     ExchangeCode,
     CandleInterval,
     FuturesMarginMode,
+    FuturesResolution,
     PositionMarginType,
     NotificationType,
 )
@@ -74,6 +75,7 @@ __all__ = [
     'ExchangeCode',
     'CandleInterval',
     'FuturesMarginMode',
+    'FuturesResolution',
     'PositionMarginType',
     'NotificationType',
 ]

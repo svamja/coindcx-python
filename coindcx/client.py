@@ -70,7 +70,7 @@ class Client:
         self.market = MarketEndpoints(self._get)
         self.spot = SpotEndpoints(self._post)
         self.margin = MarginEndpoints(self._post)
-        self.futures = FuturesEndpoints(self._post)
+        self.futures = FuturesEndpoints(self._get, self._post)
 
     def _generate_signature(self, payload: str) -> str:
         """
@@ -389,6 +389,52 @@ class Client:
             CoinDCXAuthenticationException: If API credentials not provided
         """
         return self.spot.get_user_info()
+
+    # ===== Futures Endpoints =====
+    # Delegated to FuturesEndpoints
+
+    def get_futures_candles(
+        self,
+        pair: str,
+        from_time: int,
+        to_time: int,
+        resolution: str,
+    ) -> dict:
+        """
+        Get candlestick data for a futures instrument
+
+        Args:
+            pair: Futures pair (e.g., 'B-BTC_USDT')
+            from_time: Start timestamp in seconds (EPOCH)
+            to_time: End timestamp in seconds (EPOCH)
+            resolution: Candle resolution - '1' (1min), '5' (5min), '60' (1hour), '1D' (1day)
+                       Use FuturesResolution enum for type safety
+
+        Returns:
+            Dictionary with candlestick data containing:
+                - s: status ("ok" if successful)
+                - data: List of candle objects with open, high, low, close, volume, time
+
+        Example:
+            >>> from coindcx import Client, FuturesResolution
+            >>> import time
+            >>> client = Client()
+            >>> to_time = int(time.time())
+            >>> from_time = to_time - (7 * 24 * 60 * 60)  # 7 days ago
+            >>> candles = client.get_futures_candles(
+            ...     'B-BTC_USDT',
+            ...     from_time,
+            ...     to_time,
+            ...     FuturesResolution.ONE_DAY
+            ... )
+            >>> print(f"Received {len(candles['data'])} candles")
+
+        Note:
+            - Timestamps should be in seconds, not milliseconds (different from spot candles)
+            - Resolution uses different format than spot: '1', '5', '60', '1D'
+            - This is a public endpoint, no authentication required
+        """
+        return self.futures.get_futures_candles(pair, from_time, to_time, resolution)
 
     def close(self):
         """Close the client session"""

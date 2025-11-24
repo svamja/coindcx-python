@@ -122,6 +122,18 @@ class NotificationType(str, Enum):
     PUSH_NOTIFICATION = "push_notification"
 
 
+class FuturesResolution(str, Enum):
+    """
+    Futures candlestick resolution/interval
+
+    Note: Futures uses different format than spot candles
+    """
+    ONE_MINUTE = "1"
+    FIVE_MINUTES = "5"
+    ONE_HOUR = "60"
+    ONE_DAY = "1D"
+
+
 # API Base URLs
 API_BASE_URL = "https://api.coindcx.com"
 PUBLIC_BASE_URL = "https://public.coindcx.com"

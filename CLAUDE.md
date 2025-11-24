@@ -1,0 +1,3 @@
+- the "documentation" refers to coindcx_documentation.md file. please read this file when documentation is mentioned.
+- the project structure is given in README.md.
+- Do not execute the python files or tests after completion of task. User will manually run and verify the output. If you need the results, you can prompt user for the output.
