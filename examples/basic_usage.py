@@ -92,7 +92,7 @@ def public_endpoints_example():
     print("\n6. Getting candlestick data (1 hour intervals)...")
     try:
         candles = client.get_candles(
-            pair='B-BTC_USDT',
+            pair='KC-BTC_USDT',
             interval=CandleInterval.ONE_HOUR,
             limit=24  # Last 24 hours
         )
