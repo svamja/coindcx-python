@@ -70,6 +70,34 @@ candles = client.get_candles('KC-BTC_USDT', interval='1h', limit=24)
 print(f"24h candles received: {len(candles)}")
 ```
 
+### Futures Endpoints (Public)
+
+```python
+from coindcx import Client
+import time
+
+client = Client()
+
+# Get all active USDT margined futures instruments
+instruments = client.get_active_instruments(['USDT'])
+print(f"Total USDT instruments: {len(instruments)}")
+print(f"Sample instruments: {instruments[:5]}")
+
+# Get detailed information for a specific instrument
+details = client.get_instrument_details('KC-BTC_USDT', 'USDT')
+instrument = details['instrument']
+print(f"Status: {instrument['status']}")
+print(f"Max leverage: {instrument['max_leverage_long']}x")
+print(f"Maker fee: {instrument['maker_fee']}%")
+print(f"Min quantity: {instrument['min_quantity']}")
+
+# Get futures candlestick data
+to_time = int(time.time())
+from_time = to_time - (7 * 24 * 60 * 60)  # 7 days ago
+candles = client.get_futures_candles('KC-BTC_USDT', from_time, to_time, '1D')
+print(f"Futures candles: {len(candles['data'])}")
+```
+
 ### Authenticated Endpoints
 
 ```python
@@ -153,6 +181,11 @@ python cli.py get_markets_details
 # Get futures candles
 python cli.py get_futures_candles --pair=KC-BTC_USDT --from_time=1700000000 --to_time=1700086400 --resolution=1D
 
+# Get active futures instruments
+python cli.py get_active_instruments --margin_currency_short_name=["USDT"]
+
+# Get instrument details
+python cli.py get_instrument_details --pair=KC-BTC_USDT --margin_currency_short_name=USDT
 ```
 
 **Authenticated Endpoints:**
@@ -295,6 +328,11 @@ Available enums:
 - `get_orderbook(pair)` - Get order book
 - `get_candles(pair, interval, ...)` - Get candlestick data
 
+**Futures Public Endpoints:**
+- `get_futures_candles(pair, from_time, to_time, resolution)` - Get futures candlestick data
+- `get_active_instruments(margin_currency_short_name)` - Get list of active futures instruments
+- `get_instrument_details(pair, margin_currency_short_name)` - Get detailed instrument information
+
 **Authenticated Endpoints:**
 - `get_balances()` - Get account balances
 - `get_user_info()` - Get user information
@@ -377,11 +415,13 @@ export COINDCX_API_SECRET="your_api_secret"
 
 # Run Python examples
 python examples/basic_usage.py
+python examples/futures_instruments.py  # Futures instruments example
 
 # Or use the CLI tool for quick testing
 python cli.py get_markets
 python cli.py get_ticker
 python cli.py get_balances  # Requires API credentials
+python cli.py get_active_instruments --margin_currency_short_name=["USDT"]
 ```
 
 ## Getting API Credentials
