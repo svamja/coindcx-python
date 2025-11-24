@@ -37,7 +37,7 @@ def main():
     # Example 4: Get detailed information for BTC USDT futures
     if usdt_instruments:
         # Use first instrument from the list
-        btc_pair = 'KC-BTC_USDT' if 'KC-BTC_USDT' in usdt_instruments else usdt_instruments[0]
+        btc_pair = 'B-BTC_USDT' if 'B-BTC_USDT' in usdt_instruments else usdt_instruments[0]
         print(f"\n4. Getting detailed information for {btc_pair}...")
 
         details = client.get_instrument_details(btc_pair, 'USDT')

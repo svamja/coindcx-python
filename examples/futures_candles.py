@@ -33,7 +33,7 @@ def get_futures_candles_example():
     try:
         # Get 1-day candles for BTC futures
         candles = client.get_futures_candles(
-            pair='KC-BTC_USDT',
+            pair='B-BTC_USDT',
             from_time=from_time,
             to_time=to_time,
             resolution=FuturesResolution.ONE_DAY
@@ -87,7 +87,7 @@ def get_futures_candles_different_resolutions():
 
         try:
             candles = client.get_futures_candles(
-                pair='KC-ETH_USDT',
+                pair='B-ETH_USDT',
                 from_time=from_time,
                 to_time=to_time,
                 resolution=resolution
@@ -125,7 +125,7 @@ def compare_spot_vs_futures():
     try:
         # Get futures candles (timestamps in seconds)
         futures_candles = client.get_futures_candles(
-            pair='KC-BTC_USDT',
+            pair='B-BTC_USDT',
             from_time=from_time,
             to_time=to_time,
             resolution=FuturesResolution.ONE_HOUR

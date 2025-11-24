@@ -23,10 +23,10 @@ Examples:
     python cli.py get_balances
 
     # Futures endpoints
-    python cli.py get_futures_candles --pair=KC-BTC_USDT --from_time=1234567890 --to_time=1234567900 --resolution=1D
+    python cli.py get_futures_candles --pair=B-BTC_USDT --from_time=1234567890 --to_time=1234567900 --resolution=1D
     python cli.py get_active_instruments --margin_currency_short_name=["USDT"]
     python cli.py get_active_instruments --margin_currency_short_name=USDT,INR
-    python cli.py get_instrument_details --pair=KC-BTC_USDT --margin_currency_short_name=USDT
+    python cli.py get_instrument_details --pair=B-BTC_USDT --margin_currency_short_name=USDT
 
 Features:
     - Automatic method discovery from Client class

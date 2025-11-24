@@ -45,7 +45,7 @@ class FuturesEndpoints:
         Get candlestick data for a futures instrument
 
         Args:
-            pair: Futures pair (e.g., 'KC-BTC_USDT')
+            pair: Futures pair (e.g., 'B-BTC_USDT')
             from_time: Start timestamp in seconds (EPOCH)
             to_time: End timestamp in seconds (EPOCH)
             resolution: Candle resolution - '1' (1min), '5' (5min), '60' (1hour), '1D' (1day)
@@ -61,7 +61,7 @@ class FuturesEndpoints:
             >>> import time
             >>> to_time = int(time.time())
             >>> from_time = to_time - (7 * 24 * 60 * 60)  # 7 days ago
-            >>> candles = client.get_futures_candles('KC-BTC_USDT', from_time, to_time, '1D')
+            >>> candles = client.get_futures_candles('B-BTC_USDT', from_time, to_time, '1D')
             >>> print(f"Status: {candles['s']}")
             >>> for candle in candles['data']:
             ...     print(f"Open: {candle['open']}, Close: {candle['close']}")
@@ -90,7 +90,7 @@ class FuturesEndpoints:
                                        If not provided, returns instruments for USDT margin mode by default
 
         Returns:
-            List of active instrument pairs (e.g., ['KC-BTC_USDT', 'KC-ETH_USDT', ...])
+            List of active instrument pairs (e.g., ['B-BTC_USDT', 'B-ETH_USDT', ...])
 
         Example:
             >>> client = Client()
@@ -125,7 +125,7 @@ class FuturesEndpoints:
         Get detailed information for a specific futures instrument
 
         Args:
-            pair: Futures instrument pair (e.g., 'KC-BTC_USDT', 'KC-ETH_USDT')
+            pair: Futures instrument pair (e.g., 'B-BTC_USDT', 'B-ETH_USDT')
             margin_currency_short_name: Margin currency mode - 'USDT' or 'INR' (default: 'USDT')
 
         Returns:
@@ -153,14 +153,14 @@ class FuturesEndpoints:
         Example:
             >>> client = Client()
             >>> # Get BTC futures instrument details (USDT margin)
-            >>> btc_details = client.get_instrument_details('KC-BTC_USDT', 'USDT')
+            >>> btc_details = client.get_instrument_details('B-BTC_USDT', 'USDT')
             >>> print(f"Status: {btc_details['instrument']['status']}")
             >>> print(f"Max leverage: {btc_details['instrument']['max_leverage_long']}x")
             >>> print(f"Maker fee: {btc_details['instrument']['maker_fee']}%")
             >>> print(f"Min quantity: {btc_details['instrument']['min_quantity']}")
             >>>
             >>> # Get INR margined instrument
-            >>> eth_inr = client.get_instrument_details('KC-ETH_USDT', 'INR')
+            >>> eth_inr = client.get_instrument_details('B-ETH_USDT', 'INR')
 
         Note:
             - This is a public endpoint, no authentication required

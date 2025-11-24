@@ -2,3 +2,4 @@
 - the project structure is given in README.md.
 - Do not execute the python files or tests after completion of task. User will manually run and verify the output. If you need the results, you can prompt user for the output.
 - Use "KC-" exchange code prefix, instead of "B-" prefix when writing examples, comments or readme.
+- use "B-" exchange code prefix for pairs, for future instruments.

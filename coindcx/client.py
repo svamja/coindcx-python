@@ -404,7 +404,7 @@ class Client:
         Get candlestick data for a futures instrument
 
         Args:
-            pair: Futures pair (e.g., 'KC-BTC_USDT')
+            pair: Futures pair (e.g., 'B-BTC_USDT')
             from_time: Start timestamp in seconds (EPOCH)
             to_time: End timestamp in seconds (EPOCH)
             resolution: Candle resolution - '1' (1min), '5' (5min), '60' (1hour), '1D' (1day)
@@ -422,7 +422,7 @@ class Client:
             >>> to_time = int(time.time())
             >>> from_time = to_time - (7 * 24 * 60 * 60)  # 7 days ago
             >>> candles = client.get_futures_candles(
-            ...     'KC-BTC_USDT',
+            ...     'B-BTC_USDT',
             ...     from_time,
             ...     to_time,
             ...     FuturesResolution.ONE_DAY
@@ -445,7 +445,7 @@ class Client:
                                        If not provided, returns instruments for USDT margin mode by default
 
         Returns:
-            List of active instrument pairs (e.g., ['KC-BTC_USDT', 'KC-ETH_USDT', ...])
+            List of active instrument pairs (e.g., ['B-BTC_USDT', 'B-ETH_USDT', ...])
 
         Example:
             >>> client = Client()
@@ -470,7 +470,7 @@ class Client:
         Get detailed information for a specific futures instrument
 
         Args:
-            pair: Futures instrument pair (e.g., 'KC-BTC_USDT', 'KC-ETH_USDT')
+            pair: Futures instrument pair (e.g., 'B-BTC_USDT', 'B-ETH_USDT')
             margin_currency_short_name: Margin currency mode - 'USDT' or 'INR' (default: 'USDT')
 
         Returns:
@@ -480,7 +480,7 @@ class Client:
         Example:
             >>> client = Client()
             >>> # Get BTC futures instrument details
-            >>> details = client.get_instrument_details('KC-BTC_USDT', 'USDT')
+            >>> details = client.get_instrument_details('B-BTC_USDT', 'USDT')
             >>> instrument = details['instrument']
             >>> print(f"Status: {instrument['status']}")
             >>> print(f"Max leverage: {instrument['max_leverage_long']}x")

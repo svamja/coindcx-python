@@ -84,7 +84,7 @@ print(f"Total USDT instruments: {len(instruments)}")
 print(f"Sample instruments: {instruments[:5]}")
 
 # Get detailed information for a specific instrument
-details = client.get_instrument_details('KC-BTC_USDT', 'USDT')
+details = client.get_instrument_details('B-BTC_USDT', 'USDT')
 instrument = details['instrument']
 print(f"Status: {instrument['status']}")
 print(f"Max leverage: {instrument['max_leverage_long']}x")
@@ -94,7 +94,7 @@ print(f"Min quantity: {instrument['min_quantity']}")
 # Get futures candlestick data
 to_time = int(time.time())
 from_time = to_time - (7 * 24 * 60 * 60)  # 7 days ago
-candles = client.get_futures_candles('KC-BTC_USDT', from_time, to_time, '1D')
+candles = client.get_futures_candles('B-BTC_USDT', from_time, to_time, '1D')
 print(f"Futures candles: {len(candles['data'])}")
 ```
 
@@ -179,14 +179,14 @@ python cli.py get_candles --pair=KC-BTC_USDT --interval=1h --limit=24
 python cli.py get_markets_details
 
 # Get futures candles
-python cli.py get_futures_candles --pair=KC-BTC_USDT --from_time=1700000000 --to_time=1700086400 --resolution=1D
+python cli.py get_futures_candles --pair=B-BTC_USDT --from_time=1700000000 --to_time=1700086400 --resolution=1D
 
 # Get active futures instruments (JSON format or comma-separated)
 python cli.py get_active_instruments --margin_currency_short_name=["USDT"]
 python cli.py get_active_instruments --margin_currency_short_name=USDT,INR
 
 # Get instrument details
-python cli.py get_instrument_details --pair=KC-BTC_USDT --margin_currency_short_name=USDT
+python cli.py get_instrument_details --pair=B-BTC_USDT --margin_currency_short_name=USDT
 ```
 
 **Authenticated Endpoints:**
@@ -423,7 +423,7 @@ python cli.py get_markets
 python cli.py get_ticker
 python cli.py get_balances  # Requires API credentials
 python cli.py get_active_instruments --margin_currency_short_name=USDT
-python cli.py get_instrument_details --pair=KC-BTC_USDT
+python cli.py get_instrument_details --pair=B-BTC_USDT
 ```
 
 ## Getting API Credentials
