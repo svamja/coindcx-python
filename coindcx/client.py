@@ -727,6 +727,23 @@ class Client:
             stop_loss_price=stop_loss_price,
         )
 
+    def get_futures_trade_history(self, pair: str) -> list:
+        """
+        Get real-time trade history for a futures instrument
+
+        Args:
+            pair: Futures pair (e.g., 'B-BTC_USDT')
+
+        Returns:
+            List of trade dictionaries containing price, quantity, timestamp, etc.
+
+        Example:
+            >>> client = Client()
+            >>> trades = client.get_futures_trade_history('B-BTC_USDT')
+            >>> print(f"Latest trade price: {trades[0]['price']}")
+        """
+        return self.futures.get_trade_history(pair)
+
     def close(self):
         """Close the client session"""
         self.session.close()

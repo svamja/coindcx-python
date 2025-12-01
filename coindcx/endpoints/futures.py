@@ -449,6 +449,36 @@ class FuturesEndpoints:
 
         return self._post('/exchange/v1/derivatives/futures/orders/edit', data=data)
 
+    def get_trade_history(self, pair: str) -> list:
+        """
+        Get real-time trade history for a futures instrument
+
+        Args:
+            pair: Futures pair (e.g., 'B-BTC_USDT')
+
+        Returns:
+            List of trade dictionaries containing:
+                - price: Trade price
+                - quantity: Trade quantity
+                - timestamp: Trade timestamp
+                - is_maker: Boolean indicating if trade was maker
+
+        Example:
+            >>> client = Client()
+            >>> trades = client.get_futures_trade_history('B-BTC_USDT')
+            >>> for trade in trades[:5]:
+            ...     print(f"Price: {trade['price']}, Quantity: {trade['quantity']}")
+
+        Note:
+            - This is a public endpoint, no authentication required
+            - Authentication wrapper handles endpoint access correctly
+        """
+        return self._get(
+            '/exchange/v1/derivatives/futures/data/trades',
+            params={'pair': pair},
+            use_public_url=False
+        )
+
     # TODO: Implement remaining authenticated futures trading endpoints
     # - cancel_futures_order()
     # - get_futures_positions()

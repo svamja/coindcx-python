@@ -96,6 +96,11 @@ to_time = int(time.time())
 from_time = to_time - (7 * 24 * 60 * 60)  # 7 days ago
 candles = client.get_futures_candles('B-BTC_USDT', from_time, to_time, '1D')
 print(f"Futures candles: {len(candles['data'])}")
+
+# Get futures trade history
+trades = client.get_futures_trade_history('B-BTC_USDT')
+for trade in trades[:5]:
+    print(f"Trade: {trade['quantity']} @ {trade['price']} (Maker: {trade['is_maker']})")
 ```
 
 ### Authenticated Endpoints
@@ -283,6 +288,9 @@ python cli.py get_markets_details
 # Get futures candles
 python cli.py get_futures_candles --pair=B-BTC_USDT --from_time=1700000000 --to_time=1700086400 --resolution=1D
 
+# Get futures trade history
+python cli.py get_futures_trade_history --pair=B-BTC_USDT
+
 # Get active futures instruments (JSON format or comma-separated)
 python cli.py get_active_instruments --margin_currency_short_name=["USDT"]
 python cli.py get_active_instruments --margin_currency_short_name=USDT,INR
@@ -451,6 +459,7 @@ Available enums:
 - `get_futures_candles(pair, from_time, to_time, resolution)` - Get futures candlestick data
 - `get_active_instruments(margin_currency_short_name)` - Get list of active futures instruments
 - `get_instrument_details(pair, margin_currency_short_name)` - Get detailed instrument information
+- `get_futures_trade_history(pair)` - Get real-time trade history for futures
 
 **Authenticated Endpoints:**
 - `get_balances()` - Get account balances
