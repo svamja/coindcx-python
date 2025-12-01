@@ -52,8 +52,8 @@ class MarginOrderStatus(str, Enum):
 
 class FuturesOrderType(str, Enum):
     """Order types for futures trading"""
-    MARKET = "market"
-    LIMIT = "limit"
+    MARKET = "market_order"
+    LIMIT = "limit_order"
     STOP_LIMIT = "stop_limit"
     STOP_MARKET = "stop_market"
     TAKE_PROFIT_LIMIT = "take_profit_limit"

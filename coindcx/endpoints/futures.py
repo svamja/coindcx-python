@@ -322,9 +322,6 @@ class FuturesEndpoints:
             "pair": pair,
             "order_type": order_type.value if isinstance(order_type, FuturesOrderType) else order_type,
             "total_quantity": total_quantity,
-            "notification": notification.value if isinstance(notification, NotificationType) else notification,
-            "hidden": hidden,
-            "post_only": post_only,
         }
 
         # Add optional parameters
@@ -349,12 +346,10 @@ class FuturesEndpoints:
             order_data["stop_loss_price"] = stop_loss_price
 
         # Build final request with nested structure
+        margin_currency_short_name = margin_currency_short_name.value if isinstance(margin_currency_short_name, FuturesMarginMode) else margin_currency_short_name
+        order_data["margin_currency_short_name"] = margin_currency_short_name
         data = {
             "order": order_data,
-            "margin_currency_short_name": (
-                margin_currency_short_name.value if isinstance(margin_currency_short_name, FuturesMarginMode)
-                else margin_currency_short_name
-            )
         }
 
         # Make request (timestamp added automatically by _post)
