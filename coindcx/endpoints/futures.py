@@ -4,7 +4,16 @@ CoinDCX Futures Trading Endpoints
 Endpoints for futures trading operations.
 """
 
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
+from ..enums import (
+    OrderSide,
+    FuturesOrderType,
+    NotificationType,
+    TimeInForce,
+    FuturesMarginMode,
+    PositionMarginType,
+)
+from ..exceptions import CoinDCXInvalidOrderException
 
 
 class FuturesEndpoints:
@@ -174,8 +183,190 @@ class FuturesEndpoints:
 
         return self._get('/exchange/v1/derivatives/futures/data/instrument', params=params)
 
-    # TODO: Implement authenticated futures trading endpoints
-    # - create_futures_order()
+    def create_order(
+        self,
+        pair: str,
+        side: Union[str, OrderSide],
+        order_type: Union[str, FuturesOrderType],
+        total_quantity: float,
+        notification: Union[str, NotificationType] = NotificationType.NO_NOTIFICATION,
+        leverage: Optional[int] = None,
+        price: Optional[float] = None,
+        stop_price: Optional[float] = None,
+        time_in_force: Optional[Union[str, TimeInForce]] = None,
+        hidden: bool = False,
+        post_only: bool = False,
+        margin_currency_short_name: Union[str, FuturesMarginMode] = FuturesMarginMode.USDT,
+        position_margin_type: Optional[Union[str, PositionMarginType]] = None,
+        take_profit_price: Optional[float] = None,
+        stop_loss_price: Optional[float] = None,
+    ) -> dict:
+        """
+        Create a futures order
+
+        Args:
+            pair: Futures pair (e.g., 'B-BTC_USDT', 'B-ETH_USDT')
+            side: Order side - 'buy' or 'sell' (or use OrderSide enum)
+            order_type: Order type - 'market', 'limit', 'stop_limit', 'stop_market',
+                       'take_profit_limit', 'take_profit_market' (or use FuturesOrderType enum)
+            total_quantity: Total quantity of contracts to trade
+            notification: Notification type (default: NO_NOTIFICATION)
+            leverage: Leverage multiplier (e.g., 10 for 10x leverage)
+            price: Limit price (required for limit-type orders)
+            stop_price: Stop/trigger price (required for stop/take-profit orders)
+            time_in_force: Time in force - 'good_till_cancel', 'fill_or_kill', 'immediate_or_cancel'
+                          Do not include for market orders
+            hidden: Whether to hide the order from the orderbook
+            post_only: Whether this is a post-only order (maker-only)
+            margin_currency_short_name: Margin currency - 'USDT' or 'INR' (default: USDT)
+            position_margin_type: Position margin type - 'isolated' or 'crossed'
+            take_profit_price: Take profit trigger price (applied to entire position)
+            stop_loss_price: Stop loss trigger price (applied to entire position)
+
+        Returns:
+            Dictionary containing order details including:
+                - id: Order ID
+                - status: Order status
+                - side: Order side
+                - order_type: Order type
+                - pair: Futures pair
+                - total_quantity: Total quantity
+                - remaining_quantity: Remaining quantity
+                - price: Order price
+                - leverage: Leverage used
+                - created_at: Order creation timestamp
+
+        Raises:
+            CoinDCXInvalidOrderException: If required parameters are missing or invalid
+            CoinDCXAuthenticationException: If API credentials not provided
+            CoinDCXAPIException: For API errors
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # Create a limit buy order with 10x leverage
+            >>> order = client.create_futures_order(
+            ...     pair='B-BTC_USDT',
+            ...     side=OrderSide.BUY,
+            ...     order_type=FuturesOrderType.LIMIT,
+            ...     total_quantity=0.01,
+            ...     price=50000,
+            ...     leverage=10
+            ... )
+            >>> print(f"Order ID: {order['id']}, Status: {order['status']}")
+            >>>
+            >>> # Create a market sell order with TP/SL triggers
+            >>> order = client.create_futures_order(
+            ...     pair='B-BTC_USDT',
+            ...     side='sell',
+            ...     order_type='market',
+            ...     total_quantity=0.01,
+            ...     leverage=5,
+            ...     take_profit_price=55000,
+            ...     stop_loss_price=48000
+            ... )
+            >>>
+            >>> # Create a stop-limit order
+            >>> order = client.create_futures_order(
+            ...     pair='B-BTC_USDT',
+            ...     side='buy',
+            ...     order_type=FuturesOrderType.STOP_LIMIT,
+            ...     total_quantity=0.01,
+            ...     price=49000,
+            ...     stop_price=49500,
+            ...     leverage=10,
+            ...     time_in_force=TimeInForce.GOOD_TILL_CANCEL
+            ... )
+
+        Note:
+            - Rate limit: 2000 requests per 60 seconds
+            - Do not include time_in_force for market orders
+            - TP/SL validation rules:
+              * Buy Orders: stop_loss_price < LTP < take_profit_price
+              * Sell Orders: take_profit_price < LTP < stop_loss_price
+            - Take profit/stop loss triggers apply to your entire position
+            - Use B- prefix for futures pairs
+        """
+        # Validate parameters for limit-type orders
+        limit_types = [
+            FuturesOrderType.LIMIT,
+            FuturesOrderType.STOP_LIMIT,
+            FuturesOrderType.TAKE_PROFIT_LIMIT,
+            "limit",
+            "stop_limit",
+            "take_profit_limit"
+        ]
+        if order_type in limit_types and price is None:
+            raise CoinDCXInvalidOrderException(
+                "price is required for limit-type orders"
+            )
+
+        # Validate parameters for stop/take-profit orders
+        stop_types = [
+            FuturesOrderType.STOP_LIMIT,
+            FuturesOrderType.STOP_MARKET,
+            FuturesOrderType.TAKE_PROFIT_LIMIT,
+            FuturesOrderType.TAKE_PROFIT_MARKET,
+            "stop_limit",
+            "stop_market",
+            "take_profit_limit",
+            "take_profit_market"
+        ]
+        if order_type in stop_types and stop_price is None:
+            raise CoinDCXInvalidOrderException(
+                "stop_price is required for stop/take-profit orders"
+            )
+
+        # Build nested request structure
+        order_data = {
+            "side": side.value if isinstance(side, OrderSide) else side,
+            "pair": pair,
+            "order_type": order_type.value if isinstance(order_type, FuturesOrderType) else order_type,
+            "total_quantity": total_quantity,
+            "notification": notification.value if isinstance(notification, NotificationType) else notification,
+            "hidden": hidden,
+            "post_only": post_only,
+        }
+
+        # Add optional parameters
+        if leverage is not None:
+            order_data["leverage"] = leverage
+        if price is not None:
+            order_data["price"] = price
+        if stop_price is not None:
+            order_data["stop_price"] = stop_price
+        if time_in_force is not None:
+            order_data["time_in_force"] = (
+                time_in_force.value if isinstance(time_in_force, TimeInForce) else time_in_force
+            )
+        if position_margin_type is not None:
+            order_data["position_margin_type"] = (
+                position_margin_type.value if isinstance(position_margin_type, PositionMarginType)
+                else position_margin_type
+            )
+        if take_profit_price is not None:
+            order_data["take_profit_price"] = take_profit_price
+        if stop_loss_price is not None:
+            order_data["stop_loss_price"] = stop_loss_price
+
+        # Build final request with nested structure
+        data = {
+            "order": order_data,
+            "margin_currency_short_name": (
+                margin_currency_short_name.value if isinstance(margin_currency_short_name, FuturesMarginMode)
+                else margin_currency_short_name
+            )
+        }
+
+        # Make request (timestamp added automatically by _post)
+        response = self._post('/exchange/v1/derivatives/futures/orders/create', data=data)
+
+        # Extract first order from array response
+        if isinstance(response, list) and len(response) > 0:
+            return response[0]
+
+        return response
+
+    # TODO: Implement remaining authenticated futures trading endpoints
     # - cancel_futures_order()
     # - get_futures_positions()
     # - update_leverage()

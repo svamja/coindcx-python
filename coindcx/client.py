@@ -8,7 +8,7 @@ import hmac
 import hashlib
 import json
 import time
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, Union
 from urllib.parse import urljoin
 
 import requests
@@ -19,7 +19,17 @@ from .exceptions import (
     CoinDCXAuthenticationException,
     CoinDCXRateLimitException,
 )
-from .enums import API_BASE_URL, PUBLIC_BASE_URL
+from .enums import (
+    API_BASE_URL,
+    PUBLIC_BASE_URL,
+    OrderSide,
+    OrderType,
+    FuturesOrderType,
+    NotificationType,
+    TimeInForce,
+    FuturesMarginMode,
+    PositionMarginType,
+)
 from .endpoints.market import MarketEndpoints
 from .endpoints.spot import SpotEndpoints
 from .endpoints.margin import MarginEndpoints
@@ -390,6 +400,54 @@ class Client:
         """
         return self.spot.get_user_info()
 
+    def create_spot_order(
+        self,
+        market: str,
+        side: Union[str, OrderSide],
+        order_type: Union[str, OrderType],
+        total_quantity: float,
+        price_per_unit: Optional[float] = None,
+        client_order_id: Optional[str] = None,
+    ) -> dict:
+        """
+        Create a spot order
+
+        Args:
+            market: Market pair (e.g., 'KC-BTC_USDT', 'KC-ETH_USDT')
+            side: Order side - 'buy' or 'sell' (or use OrderSide enum)
+            order_type: Order type - 'market_order' or 'limit_order' (or use OrderType enum)
+            total_quantity: Total quantity of base currency to buy/sell
+            price_per_unit: Price per unit (required for limit orders)
+            client_order_id: Optional client order ID for tracking
+
+        Returns:
+            Dictionary containing order details
+
+        Raises:
+            CoinDCXInvalidOrderException: If required parameters are missing or invalid
+            CoinDCXAuthenticationException: If API credentials not provided
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # Create a limit buy order
+            >>> order = client.create_spot_order(
+            ...     market='KC-BTC_USDT',
+            ...     side=OrderSide.BUY,
+            ...     order_type=OrderType.LIMIT_ORDER,
+            ...     total_quantity=0.001,
+            ...     price_per_unit=50000
+            ... )
+            >>> print(f"Order ID: {order['id']}, Status: {order['status']}")
+        """
+        return self.spot.create_order(
+            market=market,
+            side=side,
+            order_type=order_type,
+            total_quantity=total_quantity,
+            price_per_unit=price_per_unit,
+            client_order_id=client_order_id,
+        )
+
     # ===== Futures Endpoints =====
     # Delegated to FuturesEndpoints
 
@@ -491,6 +549,95 @@ class Client:
             - Returns comprehensive instrument configuration and trading rules
         """
         return self.futures.get_instrument_details(pair, margin_currency_short_name)
+
+    def create_futures_order(
+        self,
+        pair: str,
+        side: Union[str, OrderSide],
+        order_type: Union[str, FuturesOrderType],
+        total_quantity: float,
+        notification: Union[str, NotificationType] = NotificationType.NO_NOTIFICATION,
+        leverage: Optional[int] = None,
+        price: Optional[float] = None,
+        stop_price: Optional[float] = None,
+        time_in_force: Optional[Union[str, TimeInForce]] = None,
+        hidden: bool = False,
+        post_only: bool = False,
+        margin_currency_short_name: Union[str, FuturesMarginMode] = FuturesMarginMode.USDT,
+        position_margin_type: Optional[Union[str, PositionMarginType]] = None,
+        take_profit_price: Optional[float] = None,
+        stop_loss_price: Optional[float] = None,
+    ) -> dict:
+        """
+        Create a futures order
+
+        Args:
+            pair: Futures pair (e.g., 'B-BTC_USDT', 'B-ETH_USDT')
+            side: Order side - 'buy' or 'sell' (or use OrderSide enum)
+            order_type: Order type - 'market', 'limit', 'stop_limit', 'stop_market',
+                       'take_profit_limit', 'take_profit_market' (or use FuturesOrderType enum)
+            total_quantity: Total quantity of contracts to trade
+            notification: Notification type (default: NO_NOTIFICATION)
+            leverage: Leverage multiplier (e.g., 10 for 10x leverage)
+            price: Limit price (required for limit-type orders)
+            stop_price: Stop/trigger price (required for stop/take-profit orders)
+            time_in_force: Time in force - 'good_till_cancel', 'fill_or_kill', 'immediate_or_cancel'
+                          Do not include for market orders
+            hidden: Whether to hide the order from the orderbook
+            post_only: Whether this is a post-only order (maker-only)
+            margin_currency_short_name: Margin currency - 'USDT' or 'INR' (default: USDT)
+            position_margin_type: Position margin type - 'isolated' or 'crossed'
+            take_profit_price: Take profit trigger price (applied to entire position)
+            stop_loss_price: Stop loss trigger price (applied to entire position)
+
+        Returns:
+            Dictionary containing order details
+
+        Raises:
+            CoinDCXInvalidOrderException: If required parameters are missing or invalid
+            CoinDCXAuthenticationException: If API credentials not provided
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # Create a limit buy order with 10x leverage
+            >>> order = client.create_futures_order(
+            ...     pair='B-BTC_USDT',
+            ...     side=OrderSide.BUY,
+            ...     order_type=FuturesOrderType.LIMIT,
+            ...     total_quantity=0.01,
+            ...     price=50000,
+            ...     leverage=10
+            ... )
+            >>> print(f"Order ID: {order['id']}, Status: {order['status']}")
+            >>>
+            >>> # Create a market sell order with TP/SL
+            >>> order = client.create_futures_order(
+            ...     pair='B-BTC_USDT',
+            ...     side='sell',
+            ...     order_type='market',
+            ...     total_quantity=0.01,
+            ...     leverage=5,
+            ...     take_profit_price=55000,
+            ...     stop_loss_price=48000
+            ... )
+        """
+        return self.futures.create_order(
+            pair=pair,
+            side=side,
+            order_type=order_type,
+            total_quantity=total_quantity,
+            notification=notification,
+            leverage=leverage,
+            price=price,
+            stop_price=stop_price,
+            time_in_force=time_in_force,
+            hidden=hidden,
+            post_only=post_only,
+            margin_currency_short_name=margin_currency_short_name,
+            position_margin_type=position_margin_type,
+            take_profit_price=take_profit_price,
+            stop_loss_price=stop_loss_price,
+        )
 
     def close(self):
         """Close the client session"""
