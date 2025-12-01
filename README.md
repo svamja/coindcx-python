@@ -597,7 +597,15 @@ This library is not officially affiliated with CoinDCX. Use at your own risk. Tr
 
 ## How to prepare markdown documentation
 
-1. Use https://github.com/Goldziher/html-to-markdown
-   Online https://goldziher.github.io/html-to-markdown/
-2. Copy HTML from https://docs.coindcx.com/
-3. Copy the output markdown to "coindcx_documentation.md"
+1. Copy HTML from https://docs.coindcx.com/ to ai/coindcx_documentation.html
+2. Run 
+
+````bash
+make
+````
+
+OR
+
+````bash
+html-to-markdown ai/coindcx_documentation.html -o ai/coindcx_documentation.md
+````
