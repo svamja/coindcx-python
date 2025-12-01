@@ -129,7 +129,7 @@ from coindcx import Client, OrderSide, OrderType
 client = Client(api_key='your_key', api_secret='your_secret')
 
 # Create a market buy order - buy 0.001 BTC at market price
-market_order = client.create_order(
+market_order = client.create_spot_order(
     market='KC-BTC_USDT',
     side=OrderSide.BUY,
     order_type=OrderType.MARKET_ORDER,
@@ -138,7 +138,7 @@ market_order = client.create_order(
 print(f"Market Order ID: {market_order['id']}, Status: {market_order['status']}")
 
 # Create a limit sell order - sell 0.001 BTC at $52,000
-limit_order = client.create_order(
+limit_order = client.create_spot_order(
     market='KC-BTC_USDT',
     side=OrderSide.SELL,
     order_type=OrderType.LIMIT_ORDER,
@@ -157,7 +157,7 @@ from coindcx import Client, OrderSide, FuturesOrderType, TimeInForce
 client = Client(api_key='your_key', api_secret='your_secret')
 
 # Create a market futures order with 10x leverage
-futures_market = client.create_order(
+futures_market = client.create_futures_order(
     pair='B-BTC_USDT',
     side=OrderSide.BUY,
     order_type=FuturesOrderType.MARKET,
@@ -168,7 +168,7 @@ futures_market = client.create_order(
 print(f"Futures Market Order: {futures_market['id']}, Leverage: {futures_market['leverage']}x")
 
 # Create a limit futures order with take profit and stop loss
-futures_limit = client.create_order(
+futures_limit = client.create_futures_order(
     pair='B-BTC_USDT',
     side=OrderSide.BUY,
     order_type=FuturesOrderType.LIMIT,
@@ -183,7 +183,7 @@ futures_limit = client.create_order(
 print(f"Futures Limit Order: {futures_limit['id']}")
 
 # Create a stop-limit order (triggered when price hits stop_price)
-stop_limit = client.create_order(
+stop_limit = client.create_futures_order(
     pair='B-ETH_USDT',
     side=OrderSide.SELL,
     order_type=FuturesOrderType.STOP_LIMIT,
@@ -195,7 +195,7 @@ stop_limit = client.create_order(
 )
 
 # Create a take profit market order
-take_profit = client.create_order(
+take_profit = client.create_futures_order(
     pair='B-BTC_USDT',
     side=OrderSide.SELL,
     order_type=FuturesOrderType.TAKE_PROFIT_MARKET,
@@ -287,14 +287,14 @@ python cli.py get_balances
 python cli.py get_user_info
 
 # Create spot orders
-python cli.py create_order --market=KC-BTC_USDT --side=buy --order_type=market_order --total_quantity=0.001
+python cli.py create_spot_order --market=KC-BTC_USDT --side=buy --order_type=market_order --total_quantity=0.001
 
-python cli.py create_order --market=KC-ETH_USDT --side=sell --order_type=limit_order --total_quantity=0.1 --price_per_unit=3500 --client_order_id=my-custom-id
+python cli.py create_spot_order --market=KC-ETH_USDT --side=sell --order_type=limit_order --total_quantity=0.1 --price_per_unit=3500 --client_order_id=my-custom-id
 
-# Create futures orders (note: futures create_order requires different parameters)
-# Use the CLI help to see all available parameters for futures orders
-python cli.py get_instrument_details --pair=B-BTC_USDT --margin_currency_short_name=USDT  # Check instrument details first
-# Then create futures order using the futures-specific parameters from the code
+# Create futures orders
+python cli.py create_futures_order --pair=B-BTC_USDT --side=buy --order_type=market --total_quantity=0.01 --leverage=10 --margin_currency_short_name=USDT
+
+python cli.py create_futures_order --pair=B-BTC_USDT --side=buy --order_type=limit --total_quantity=0.01 --price=50000 --leverage=5 --time_in_force=good_till_cancel
 ```
 
 **Additional Options:**
@@ -433,10 +433,10 @@ Available enums:
 - `get_user_info()` - Get user information
 
 **Spot Trading:**
-- `create_order(market, side, order_type, total_quantity, ...)` - Create spot orders (market/limit)
+- `create_spot_order(market, side, order_type, total_quantity, ...)` - Create spot orders (market/limit)
 
 **Futures Trading:**
-- `create_order(pair, side, order_type, total_quantity, ...)` - Create futures orders (market/limit/stop/take-profit)
+- `create_futures_order(pair, side, order_type, total_quantity, ...)` - Create futures orders (market/limit/stop/take-profit)
 
 ### 🚧 Coming Soon
 
@@ -569,11 +569,11 @@ This library is not officially affiliated with CoinDCX. Use at your own risk. Tr
 ## Changelog
 
 ### v0.2.0 (2024-12-XX)
-- **NEW:** Spot order creation - `create_order()` for spot trading
+- **NEW:** Spot order creation - `create_spot_order()` for spot trading
   - Support for market and limit orders
   - Optional client order ID tracking
   - Comprehensive parameter validation
-- **NEW:** Futures order creation - `create_order()` for futures trading
+- **NEW:** Futures order creation - `create_futures_order()` for futures trading
   - Support for all futures order types: market, limit, stop-limit, stop-market, take-profit-limit, take-profit-market
   - Advanced features: leverage control, take profit/stop loss, time-in-force options
   - Post-only orders and hidden orders support
