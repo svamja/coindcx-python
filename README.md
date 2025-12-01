@@ -203,6 +203,24 @@ take_profit = client.create_futures_order(
     stop_price=60000,  # Trigger when BTC hits $60,000
     leverage=2
 )
+
+# List open futures orders
+open_orders = client.list_futures_orders(
+    side=OrderSide.BUY,
+    status='open',
+    margin_currency_short_name=['USDT']
+)
+print(f"Open Orders: {len(open_orders)}")
+
+# Edit an existing futures order
+edited_order = client.edit_futures_order(
+    id='order_id_here',
+    total_quantity=0.5,
+    price=51000,
+    take_profit_price=55000,
+    stop_loss_price=48000
+)
+print(f"Edited Order ID: {edited_order['id']}")
 ```
 
 ### Using Context Manager
@@ -295,6 +313,12 @@ python cli.py create_spot_order --market=KC-ETH_USDT --side=sell --order_type=li
 python cli.py create_futures_order --pair=B-BTC_USDT --side=buy --order_type=market --total_quantity=0.01 --leverage=10 --margin_currency_short_name=USDT
 
 python cli.py create_futures_order --pair=B-BTC_USDT --side=buy --order_type=limit --total_quantity=0.01 --price=50000 --leverage=5 --time_in_force=good_till_cancel
+
+# List futures orders
+python cli.py list_futures_orders --side=buy --status=open
+
+# Edit futures order
+python cli.py edit_futures_order --id=ORDER_ID --total_quantity=0.5 --price=51000
 ```
 
 **Additional Options:**
@@ -437,6 +461,8 @@ Available enums:
 
 **Futures Trading:**
 - `create_futures_order(pair, side, order_type, total_quantity, ...)` - Create futures orders (market/limit/stop/take-profit)
+- `list_futures_orders(side, status, ...)` - List futures orders filtering by status
+- `edit_futures_order(id, total_quantity, price, ...)` - Edit open futures orders
 
 ### 🚧 Coming Soon
 
@@ -578,6 +604,9 @@ This library is not officially affiliated with CoinDCX. Use at your own risk. Tr
   - Advanced features: leverage control, take profit/stop loss, time-in-force options
   - Post-only orders and hidden orders support
   - Isolated/crossed margin support
+- **NEW:** Futures order management
+  - `list_futures_orders()` - List orders with status filters
+  - `edit_futures_order()` - Edit open order quantity, price, and TP/SL triggers
 - **ENHANCED:** CLI tool now supports order creation commands
 - **ENHANCED:** Documentation with comprehensive trading examples
 - **ENHANCED:** Better error handling for order validation

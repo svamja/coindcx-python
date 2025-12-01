@@ -361,6 +361,94 @@ class FuturesEndpoints:
 
         return response
 
+    def list_orders(
+        self,
+        side: Union[str, OrderSide],
+        status: str = "open",
+        page: int = 1,
+        size: int = 10,
+        margin_currency_short_name: Optional[list] = None,
+    ) -> list:
+        """
+        List futures orders based on status and side
+
+        Args:
+            side: Order side - 'buy' or 'sell' (or use OrderSide enum)
+            status: Comma separated statuses (e.g., 'open', 'filled', 'cancelled')
+                   Default: 'open'
+            page: Page number (default: 1)
+            size: Number of records per page (default: 10)
+            margin_currency_short_name: List of margin currencies (e.g., ['USDT'])
+                                       Default: ['USDT']
+
+        Returns:
+            List of orders matching the criteria
+
+        Example:
+            >>> client = Client()
+            >>> # List open buy orders
+            >>> orders = client.list_orders(side='buy', status='open')
+            >>>
+            >>> # List filled sell orders
+            >>> history = client.list_orders(
+            ...     side=OrderSide.SELL,
+            ...     status='filled',
+            ...     page=1,
+            ...     size=20
+            ... )
+        """
+        if margin_currency_short_name is None:
+            margin_currency_short_name = ['USDT']
+
+        data = {
+            "side": side.value if isinstance(side, OrderSide) else side,
+            "status": status,
+            "page": str(page),
+            "size": str(size),
+            "margin_currency_short_name": margin_currency_short_name
+        }
+
+        return self._post('/exchange/v1/derivatives/futures/orders', data=data)
+
+    def edit_order(
+        self,
+        id: str,
+        total_quantity: float,
+        price: float,
+        take_profit_price: Optional[float] = None,
+        stop_loss_price: Optional[float] = None,
+    ) -> list:
+        """
+        Edit an open futures order
+
+        Args:
+            id: Order ID
+            total_quantity: New total quantity
+            price: New price
+            take_profit_price: New take profit trigger price (optional)
+            stop_loss_price: New stop loss trigger price (optional)
+
+        Returns:
+            List containing the edited order details
+
+        Note:
+            - Edit order is only supported on USDT margined Futures at the moment.
+            - Only open orders can be edited.
+            - This endpoint accepts limit price and quantity updates
+        """
+        data = {
+            "id": id,
+            "total_quantity": total_quantity,
+            "price": price,
+        }
+
+        if take_profit_price is not None:
+            data["take_profit_price"] = take_profit_price
+        if stop_loss_price is not None:
+            data["stop_loss_price"] = stop_loss_price
+
+        return self._post('/exchange/v1/derivatives/futures/orders/edit', data=data)
+
     # TODO: Implement remaining authenticated futures trading endpoints
     # - cancel_futures_order()
     # - get_futures_positions()

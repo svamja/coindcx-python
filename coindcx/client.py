@@ -639,6 +639,94 @@ class Client:
             stop_loss_price=stop_loss_price,
         )
 
+    def list_futures_orders(
+        self,
+        side: Union[str, OrderSide],
+        status: str = "open",
+        page: int = 1,
+        size: int = 10,
+        margin_currency_short_name: Optional[list] = None,
+    ) -> list:
+        """
+        List futures orders based on status and side
+
+        Args:
+            side: Order side - 'buy' or 'sell' (or use OrderSide enum)
+            status: Comma separated statuses (e.g., 'open', 'filled', 'cancelled')
+                   Default: 'open'
+            page: Page number (default: 1)
+            size: Number of records per page (default: 10)
+            margin_currency_short_name: List of margin currencies (e.g., ['USDT'])
+                                       Default: ['USDT']
+
+        Returns:
+            List of orders matching the criteria
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # List open buy orders
+            >>> orders = client.list_futures_orders(side='buy', status='open')
+            >>>
+            >>> # List filled sell orders
+            >>> history = client.list_futures_orders(
+            ...     side=OrderSide.SELL,
+            ...     status='filled',
+            ...     page=1,
+            ...     size=20
+            ... )
+        """
+        return self.futures.list_orders(
+            side=side,
+            status=status,
+            page=page,
+            size=size,
+            margin_currency_short_name=margin_currency_short_name,
+        )
+
+    def edit_futures_order(
+        self,
+        id: str,
+        total_quantity: float,
+        price: float,
+        take_profit_price: Optional[float] = None,
+        stop_loss_price: Optional[float] = None,
+    ) -> list:
+        """
+        Edit an open futures order
+
+        Args:
+            id: Order ID
+            total_quantity: New total quantity
+            price: New price
+            take_profit_price: New take profit trigger price (optional)
+            stop_loss_price: New stop loss trigger price (optional)
+
+        Returns:
+            List containing the edited order details
+
+        Note:
+            - Edit order is only supported on USDT margined Futures at the moment.
+            - Only open orders can be edited.
+            - This endpoint accepts limit price and quantity updates
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # Edit an existing order
+            >>> result = client.edit_futures_order(
+            ...     id='order_id_here',
+            ...     total_quantity=2.5,
+            ...     price=51000,
+            ...     take_profit_price=55000
+            ... )
+        """
+        return self.futures.edit_order(
+            id=id,
+            total_quantity=total_quantity,
+            price=price,
+            take_profit_price=take_profit_price,
+            stop_loss_price=stop_loss_price,
+        )
+
     def close(self):
         """Close the client session"""
         self.session.close()
