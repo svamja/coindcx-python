@@ -521,7 +521,7 @@ client = Client(
 ### Project Structure
 
 ```
-coindcx_api/
+coindcx-python/
 ├── coindcx/
 │   ├── __init__.py
 │   ├── client.py          # Main Client class

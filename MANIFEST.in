@@ -1,0 +1,11 @@
+include README.md
+include LICENSE
+include requirements.txt
+include CLAUDE.md
+recursive-include coindcx *.py
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude tests *
+recursive-exclude examples *
+recursive-exclude ai *
+recursive-exclude venv *
