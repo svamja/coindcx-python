@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "coindcx"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python wrapper for CoinDCX API with support for spot, margin, and futures trading"
 readme = "README.md"
 requires-python = ">=3.7"

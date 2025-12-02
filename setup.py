@@ -12,7 +12,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="coindcx",
-    version="0.1.0",
+    version="0.1.1",
     author="Sanjay Vamja",
     author_email="svamja@gmail.com",
     description="Python wrapper for CoinDCX API with support for spot, margin, and futures trading",

@@ -22,7 +22,7 @@ Example:
     balances = client.get_balances()
 """
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 __author__ = 'Sanjay Vamja'
 
 from .client import Client
