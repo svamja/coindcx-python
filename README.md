@@ -1,4 +1,8 @@
 # CoinDCX Python API
+[![PyPI version](https://img.shields.io/pypi/v/coindcx.svg)](https://pypi.org/project/coindcx/)
+[![License](https://img.shields.io/pypi/l/python-binance.svg)](https://pypi.org/project/coindcx/)
+[![Supported Versions](https://img.shields.io/pypi/pyversions/coindcx.svg)](https://pypi.org/project/coindcx/)
+
 
 This is an unofficial Python wrapper for the [CoinDCX Exchange API](https://coindcx.com/api/help/API%20Dashboard/) with support for public market data and authenticated trading.
 
@@ -21,13 +25,7 @@ This is an unofficial Python wrapper for the [CoinDCX Exchange API](https://coin
 ## Installation
 
 ```bash
-pip install -e .
-```
-
-Or install from requirements:
-
-```bash
-pip install -r requirements.txt
+pip install coindcx
 ```
 
 ## Quick Start
