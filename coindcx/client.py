@@ -744,6 +744,113 @@ class Client:
         """
         return self.futures.get_trade_history(pair)
 
+    def list_positions(
+        self,
+        page: int = 1,
+        size: int = 10,
+        margin_currency_short_name: Optional[list] = None,
+    ) -> list:
+        """
+        Get list of all futures positions
+
+        Args:
+            page: Page number (default: 1)
+            size: Number of records per page (default: 10)
+            margin_currency_short_name: List of margin currencies to filter by (e.g., ['USDT'], ['INR'])
+                                       Default: ['USDT']
+
+        Returns:
+            List of position dictionaries with detailed position information
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # Get all USDT margined positions
+            >>> positions = client.list_positions(page=1, size=10)
+            >>> for pos in positions:
+            ...     if pos['active_pos'] != 0:
+            ...         print(f"{pos['pair']}: {pos['active_pos']} @ {pos['avg_price']}")
+            >>>
+            >>> # Get INR margined positions
+            >>> inr_positions = client.list_positions(margin_currency_short_name=['INR'])
+        """
+        return self.futures.list_positions(
+            page=page,
+            size=size,
+            margin_currency_short_name=margin_currency_short_name,
+        )
+
+    def get_positions_by_filters(
+        self,
+        page: int = 1,
+        size: int = 10,
+        pairs: Optional[str] = None,
+        position_ids: Optional[str] = None,
+        margin_currency_short_name: Optional[list] = None,
+    ) -> list:
+        """
+        Get futures positions filtered by pairs or position IDs
+
+        Args:
+            page: Page number (default: 1)
+            size: Number of records per page (default: 10)
+            pairs: Comma-separated list of instrument pairs (e.g., 'B-BTC_USDT,B-ETH_USDT')
+            position_ids: Comma-separated list of position IDs
+            margin_currency_short_name: List of margin currencies (e.g., ['USDT'], ['INR'])
+                                       Default: ['USDT']
+
+        Returns:
+            List of position dictionaries
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # Get positions for specific pairs
+            >>> btc_eth_positions = client.get_positions_by_filters(
+            ...     pairs='B-BTC_USDT,B-ETH_USDT'
+            ... )
+            >>> # Get position by position ID
+            >>> position = client.get_positions_by_filters(
+            ...     position_ids='7830d2d6-0c3d-11ef-9b57-0fb0912383a7'
+            ... )
+
+        Note:
+            - You must provide either pairs OR position_ids, not both
+        """
+        return self.futures.get_positions_by_filters(
+            page=page,
+            size=size,
+            pairs=pairs,
+            position_ids=position_ids,
+            margin_currency_short_name=margin_currency_short_name,
+        )
+
+    def exit_position(self, position_id: str) -> dict:
+        """
+        Exit a futures position by position ID
+
+        Args:
+            position_id: Position ID to exit (obtained from list_positions)
+
+        Returns:
+            Dictionary containing success message and group_id
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # First, get your positions
+            >>> positions = client.list_positions()
+            >>> for pos in positions:
+            ...     if pos['active_pos'] != 0:
+            ...         print(f"{pos['pair']}: ID={pos['id']}")
+            >>>
+            >>> # Exit a specific position
+            >>> result = client.exit_position('434dc174-6503-4509-8b2b-71b325fe417a')
+            >>> print(f"Status: {result['message']}")
+
+        Note:
+            - This creates a market order to close the entire position
+            - System may auto-split large exit orders into smaller parts
+        """
+        return self.futures.exit_position(position_id)
+
     def close(self):
         """Close the client session"""
         self.session.close()

@@ -479,9 +479,188 @@ class FuturesEndpoints:
             use_public_url=False
         )
 
+    def list_positions(
+        self,
+        page: int = 1,
+        size: int = 10,
+        margin_currency_short_name: Optional[list] = None,
+    ) -> list:
+        """
+        Get list of all futures positions
+
+        Args:
+            page: Page number (default: 1)
+            size: Number of records per page (default: 10)
+            margin_currency_short_name: List of margin currencies to filter by (e.g., ['USDT'], ['INR'])
+                                       Default: ['USDT']
+
+        Returns:
+            List of position dictionaries containing:
+                - id: Position ID (remains fixed for a particular pair)
+                - pair: Futures pair name
+                - active_pos: Quantity of the position (negative for short positions)
+                - inactive_pos_buy: Sum of open quantities of pending buy orders
+                - inactive_pos_sell: Sum of open quantities of pending sell orders
+                - avg_price: Average entry price of the position
+                - liquidation_price: Price at which position will be liquidated (isolated margin only)
+                - locked_margin: Margin locked in position after fees and funding
+                - locked_user_margin: Initial margin invested excluding fees and funding
+                - locked_order_margin: Total margin locked in open orders
+                - take_profit_trigger: Full position take profit trigger price
+                - stop_loss_trigger: Full position stop loss trigger price
+                - leverage: Position leverage
+                - maintenance_margin: Minimum margin required to avoid liquidation
+                - mark_price: Mark price at last update (reference only, not real-time)
+                - margin_type: 'crossed' or 'isolated'
+                - settlement_currency_avg_price: USDT<>INR conversion price (INR positions only)
+                - margin_currency_short_name: Futures margin mode
+                - updated_at: Timestamp of last position update
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # Get all USDT margined positions
+            >>> positions = client.list_positions(page=1, size=10)
+            >>> for pos in positions:
+            ...     if pos['active_pos'] != 0:
+            ...         print(f"{pos['pair']}: {pos['active_pos']} @ {pos['avg_price']}")
+            >>>
+            >>> # Get INR margined positions
+            >>> inr_positions = client.list_positions(margin_currency_short_name=['INR'])
+            >>>
+            >>> # Get both USDT and INR positions
+            >>> all_positions = client.list_positions(margin_currency_short_name=['USDT', 'INR'])
+
+        Note:
+            - All margin values are in USDT for INR Futures
+            - Position ID remains fixed for a particular pair over time
+            - For cross margined positions, maintenance margin is sum of all positions
+        """
+        if margin_currency_short_name is None:
+            margin_currency_short_name = ['USDT']
+
+        data = {
+            "page": str(page),
+            "size": str(size),
+            "margin_currency_short_name": margin_currency_short_name
+        }
+
+        return self._post('/exchange/v1/derivatives/futures/positions', data=data)
+
+    def get_positions_by_filters(
+        self,
+        page: int = 1,
+        size: int = 10,
+        pairs: Optional[str] = None,
+        position_ids: Optional[str] = None,
+        margin_currency_short_name: Optional[list] = None,
+    ) -> list:
+        """
+        Get futures positions filtered by pairs or position IDs
+
+        Args:
+            page: Page number (default: 1)
+            size: Number of records per page (default: 10)
+            pairs: Comma-separated list of instrument pairs (e.g., 'B-BTC_USDT,B-ETH_USDT')
+            position_ids: Comma-separated list of position IDs
+            margin_currency_short_name: List of margin currencies (e.g., ['USDT'], ['INR'])
+                                       Default: ['USDT']
+
+        Returns:
+            List of position dictionaries (see list_positions for response format)
+
+        Raises:
+            CoinDCXInvalidOrderException: If neither pairs nor position_ids is provided
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # Get positions for specific pairs
+            >>> btc_eth_positions = client.get_positions_by_filters(
+            ...     pairs='B-BTC_USDT,B-ETH_USDT'
+            ... )
+            >>> for pos in btc_eth_positions:
+            ...     print(f"{pos['pair']}: Active {pos['active_pos']}")
+            >>>
+            >>> # Get position by position ID
+            >>> position = client.get_positions_by_filters(
+            ...     position_ids='7830d2d6-0c3d-11ef-9b57-0fb0912383a7'
+            ... )
+            >>> print(f"Leverage: {position[0]['leverage']}x")
+            >>>
+            >>> # Get multiple positions by IDs
+            >>> positions = client.get_positions_by_filters(
+            ...     position_ids='id1,id2,id3',
+            ...     margin_currency_short_name=['USDT']
+            ... )
+
+        Note:
+            - You must provide either pairs OR position_ids, not both
+            - Both parameters accept comma-separated values for multiple filters
+            - Position ID is obtained from list_positions response
+        """
+        if pairs is None and position_ids is None:
+            raise CoinDCXInvalidOrderException(
+                "Either 'pairs' or 'position_ids' parameter is required"
+            )
+
+        if margin_currency_short_name is None:
+            margin_currency_short_name = ['USDT']
+
+        data = {
+            "page": str(page),
+            "size": str(size),
+            "margin_currency_short_name": margin_currency_short_name
+        }
+
+        if pairs is not None:
+            data["pairs"] = pairs
+        if position_ids is not None:
+            data["position_ids"] = position_ids
+
+        return self._post('/exchange/v1/derivatives/futures/positions', data=data)
+
+    def exit_position(self, position_id: str) -> dict:
+        """
+        Exit a futures position by position ID
+
+        Args:
+            position_id: Position ID to exit (obtained from list_positions)
+
+        Returns:
+            Dictionary containing:
+                - message: Success message
+                - status: HTTP status code
+                - code: Response code
+                - data: Dictionary with group_id
+                  * group_id: ID used when large order is split into smaller parts.
+                              All split parts share the same group_id.
+
+        Example:
+            >>> client = Client(api_key='...', api_secret='...')
+            >>> # First, get your positions
+            >>> positions = client.list_positions()
+            >>> for pos in positions:
+            ...     if pos['active_pos'] != 0:
+            ...         print(f"{pos['pair']}: ID={pos['id']}")
+            >>>
+            >>> # Exit a specific position
+            >>> result = client.exit_position('434dc174-6503-4509-8b2b-71b325fe417a')
+            >>> print(f"Status: {result['message']}")
+            >>> print(f"Group ID: {result['data']['group_id']}")
+
+        Note:
+            - This creates a market order to close the entire position
+            - System may auto-split the exit order into smaller parts if order size is huge
+            - All split parts will have the same group_id
+            - Position ID is permanent for each pair and can be obtained from list_positions
+        """
+        data = {
+            "id": position_id
+        }
+
+        return self._post('/exchange/v1/derivatives/futures/positions/exit', data=data)
+
     # TODO: Implement remaining authenticated futures trading endpoints
     # - cancel_futures_order()
-    # - get_futures_positions()
     # - update_leverage()
     # - get_futures_transactions()
     # - get_futures_order_history()
